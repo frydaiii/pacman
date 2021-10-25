@@ -87,7 +87,59 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # result = []
+    # parent = dict()
+    # visited = set()
+
+    # stack = util.Stack()
+    # stack.push(problem.getStartState())
+    # target = problem.getStartState() # init the target
+    # while not stack.isEmpty():
+    #     currentState = stack.pop()
+    #     visited.add(currentState)
+
+    #     if problem.isGoalState(currentState):
+    #         target = currentState
+    #         break
+
+    #     for successor in problem.getSuccessors(currentState):
+    #         state = successor[0]
+    #         # print(successor, state)
+    #         if state not in visited:
+    #             visited.add(state)
+    #             stack.push(state)
+    #             parent[state] = currentState
+    
+    # currentState = target
+    # while currentState != problem.getStartState():
+    #     previousState = parent[currentState]
+    #     for successor in problem.getSuccessors(previousState):
+    #         if successor[0] == currentState:
+    #             result.append(successor[1])
+    #     currentState = previousState
+    
+    # # result = reversed(result)
+    # return result[::-1]
+    # # print(result)
+    # # util.raiseNotDefined()
+    from util import Stack
+    fringe = Stack()                # Fringe to manage which states to expand
+    fringe.push(problem.getStartState())
+    visited = []                    # List to check whether state has already been visited
+    path=[]                         # Final direction list
+    pathToCurrent=Stack()           # Stack to maintaing path from start to a state
+    currState = fringe.pop()
+    while not problem.isGoalState(currState):
+        if currState not in visited:
+            visited.append(currState)
+            successors = problem.getSuccessors(currState)
+            for child,direction,cost in successors:
+                fringe.push(child)
+                tempPath = path + [direction]
+                pathToCurrent.push(tempPath)
+        currState = fringe.pop()
+        path = pathToCurrent.pop()
+    return path
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
