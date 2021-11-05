@@ -287,7 +287,9 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+        check_if_a_corner_is_visisted = False
+        self.initialState = [check_if_a_corner_is_visisted] * 4
+        
 
     def getStartState(self):
         """
@@ -295,14 +297,23 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        startState = (self.startingPosition, self.initialState)
+
+        return startState
+       
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        for check in state[1]:
+            if not check:
+                return False
+        return True
+
+        
 
     def getSuccessors(self, state):
         """
@@ -325,6 +336,22 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            nextPosition = (nextx, nexty)
+            state_corners = state[1][:]
+
+            if not hitsWall:
+                if nextPosition in self.corners:
+                    nextPosition_index = self.corners.index(nextPosition)
+                    state_corners[nextPosition_index] = True
+
+                stepCost = 1
+                successor = ((nextPosition, state_corners), action, stepCost)
+                successors.append(successor)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,6 +387,16 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+
+    if not problem.isGoalState(state):
+        distancesToGoals = []
+        index = 0
+        for check in state[1]:
+            if not check:
+                distancesToGoals.append(util.manhattanDistance(state[0], corners[index]))
+            index += 1
+        return max(distancesToGoals)
+
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
