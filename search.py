@@ -113,7 +113,8 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
+    # visited = set()
+    visited = []
     path = []
     currentPath = util.Queue()
 
@@ -122,7 +123,7 @@ def breadthFirstSearch(problem):
     while not queue.isEmpty():
         currentState = queue.pop()
         if currentState not in visited:
-            visited.add(currentState)
+            visited.append(currentState)
 
             if problem.isGoalState(currentState):
                 break
@@ -170,10 +171,68 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+def calculateFn(problem, generatedState, heuristic):
+    f_n = problem.getCostOfActions(generatedState[1]) + heuristic(generatedState[0], problem)
+    return f_n 
+
+from util import PriorityQueue, Stack
+
+class MyPriorityQueueWithFunction(PriorityQueue):
+    """
+    Implements a priority queue with the same push/pop signature of the
+    Queue and the Stack classes. This is designed for drop-in replacement for
+    those two classes. The caller has to provide a priority function, which
+    extracts each item's priority.
+    """
+    def  __init__(self, problem, priorityFunction):
+        "priorityFunction (item) -> priority"
+        self.priorityFunction = priorityFunction      # store the priority function
+        PriorityQueue.__init__(self)        # super-class initializer
+        self.problem = problem
+
+    def push(self, item, heuristic):
+        "Adds an item to the queue with priority from the priority function"
+        PriorityQueue.push(self, item, self.priorityFunction(self.problem, item, heuristic))
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    path = []
+
+    open_list = MyPriorityQueueWithFunction(problem, calculateFn)
+
+    close_list = []
+
+    if problem.isGoalState(problem.getStartState()):
+        return []
+
+
+    open_list.push((problem.getStartState(), []), heuristic)
+
+
+    while (True):
+        if open_list.isEmpty():
+            return []
+
+        currentState = open_list.pop()
+
+        current_state = currentState[0]
+
+        path = currentState[1]
+
+        if current_state in close_list:
+            continue
+
+        if problem.isGoalState(current_state):
+            return path
+
+        generatedStates = problem.getSuccessors(current_state)
+        close_list.append(current_state)
+
+        for generatedState in generatedStates:
+            if generatedState[0] not in close_list:
+                open_list.push((generatedState[0], path + [generatedState[1]]), heuristic)
 
 
 # Abbreviations
