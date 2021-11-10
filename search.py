@@ -113,7 +113,8 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
+    # visited = set()
+    visited = []
     path = []
     currentPath = util.Queue()
 
@@ -122,7 +123,7 @@ def breadthFirstSearch(problem):
     while not queue.isEmpty():
         currentState = queue.pop()
         if currentState not in visited:
-            visited.add(currentState)
+            visited.append(currentState)
 
             if problem.isGoalState(currentState):
                 break
